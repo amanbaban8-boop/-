@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Конструктор приглашений</title>
+<style>textarea{font:16px Arial}
+body{margin:0;background:#f3efe8;color:#2d2a26;font:15px/1.4 Arial,sans-serif}
+.w{max-width:640px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}.sub{color:#777;margin:0 0 20px}
+.box{background:#fff;border:1px solid #ddd3c2;padding:18px;margin-bottom:16px}
+h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#a88b61;margin:0 0 12px}
+label{display:block;font-size:13px;color:#555;margin:10px 0 4px}
+textarea,select,input{width:100%;box-sizing:border-box;padding:11px;font-size:16px;border:1px solid #cfc4b0;background:#fffdf9}
+.r{display:flex;gap:10px}.r>div{flex:1}
+small{color:#888;display:block;margin-top:4px}
+button{width:100%;padding:16px;font-size:16px;background:#2d2a26;color:#fff;border:0;cursor:pointer;margin-top:6px}
+button.sec{background:#a88b61;margin-top:10px}
+button.ghost{background:#f3efe8;color:#2d2a26;border:1px solid #cfc4b0;margin-top:10px}
+#st{margin-top:12px;color:#a33;min-height:20px;word-break:break-word}
+.linkbox{margin-top:14px;padding:14px;background:#fffdf9;border:1px solid #a88b61;display:none}
+.linkbox input{margin-top:6px;background:#fff;font-size:14px}
+.link-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.link-actions button{flex:1;min-width:140px;padding:12px;font-size:14px;margin-top:0}
+</style></head><body><div class="w" id="builderApp">
+<h1>Конструктор приглашений</h1>
+<p class="sub">Заполните данные о торжестве и получите готовую ссылку для гостей.</p>
+<div class="box"><h2>Пара</h2>
+<div class="r"><div><label>Жених</label><input id="g" value="Акжигит"></div><div><label>Невеста</label><input id="b" value="Азиза"></div></div>
+<label>Невеста в родительном падеже (чьей свадьбе? напр. Азизанын)</label><input id="bg" value="Азизанын">
+<label>Той ээлери (хозяева тоя)</label><input id="h" value="Жаркын &amp; Шергазы"></div>
+<div class="box"><h2>Когда и где</h2>
+<div class="r"><div><label>Дата</label><input id="d" type="date" value="2026-12-05"></div><div><label>Время начала</label><input id="t" type="time" value="17:00"></div></div>
+<label>Название места</label><input id="p" value="«Аристократ» рестораны">
+<label>Адрес</label><input id="a" value="Манас көчөсү, 14">
+<label>Ссылка на карту (необязательно, иначе сам сделает по адресу)</label><input id="m" placeholder="https://maps.app.goo.gl/...">
+<label>Часовой пояс</label><input id="tz" value="+06:00"><small>Бишкек +06:00, Москва +03:00, Ташкент +05:00</small></div>
+<div class="box"><h2>Анкета и музыка</h2>
+<label>WhatsApp для ответов гостей (с кодом страны)</label><input id="ph" value="+996552499984">
+<label>Музыка (mp3, лучше до 4 МБ)</label><input id="mp" type="file" accept="audio/*">
+<label>Начать с секунды</label><input id="ms" type="number" min="0" value="15"><small>Если mp3 не выбрать, кнопка музыки не покажется.</small></div>
+<div class="box"><h2>Тексты приглашения (можно менять; {G} {B} {BG} подставят имена)</h2>
+<label>Язык по умолчанию</label><select id="lg"><option value="ky">Кыргызча (KG)</option><option value="ru">Русский (RU)</option></select>
+<label>Подпись под именами (KG)</label><input id="tk" value="Эки жүрөк, бир тагдыр, бир өмүрлүк жол…"><label>(RU)</label><input id="tr" value="Два сердца, одна судьба, одна дорога на всю жизнь…">
+<label>Надпись над заголовком (KG)</label><input id="kk" value="Кадырлуу коногубуз!"><label>(RU)</label><input id="kr" value="Дорогие гости!">
+<label>Заголовок (KG)</label><input id="hk" value="Сизди күтөбүз"><label>(RU)</label><input id="hr" value="Ждём вас">
+<label>Текст приглашения (KG)</label><textarea id="bk" rows="3">Сизди балдарыбыз {G} менен {BG} үйлөнүү тоюна арналган ак дасторконубуздун төрүнөн орун алып, кубанычыбызды тең бөлүшүүгө чакырабыз!</textarea>
+<label>(RU)</label><textarea id="br" rows="3">Приглашаем вас на свадьбу наших детей {G} и {B}. Разделите с нами радость этого дня за нашим дастарханом!</textarea>
+<label>Финальная фраза (KG)</label><input id="ek" value="Сиздин келишиңиз биз үчүн чоң сыймык жана кубаныч!"><label>(RU)</label><input id="er" value="Ваш приход — большая честь и радость для нас!"></div>
+<div class="box"><h2>Стиль и обложка</h2>
+<label>Стиль</label><select id="th"><option value="em">Изумрудный и золото (тёмный)</option><option value="nv">Ночной синий и золото (тёмный)</option><option value="bu">Бургунди и бежевый</option><option value="eu">Зелёный эвкалипт (светлый)</option><option value="ro">Пудровая роза (светлый)</option><option value="sk">Небесный голубой (светлый)</option><option value="lv">Лаванда (светлый)</option><option value="mn">Минимал чёрно-белый (светлый)</option></select>
+<label>Картинка на обложку (необязательно, jpg/png)</label><input id="cv" type="file" accept="image/*"></div>
+<div class="box"><h2>Коллаж из фото</h2>
+<label>Фото (до 6 штук; первое будет самым крупным)</label><input id="pics" type="file" accept="image/*" multiple>
+<label>Где показать коллаж</label><select id="pp"><option value="a">После приглашения, перед датой</option><option value="c">Перед анкетой (после программы и подарка)</option></select></div>
+<div class="box"><h2>Блоки (оставь пустым, чтобы не показывать)</h2>
+<label>Программа дня: по строке «время | событие KG | событие RU»</label><textarea id="pr" rows="4">16:00 | Сбор гостей
+17:00 | Свадебное торжество
+21:00 | Первый танец</textarea>
+<label>Дресс-код: название (KG)</label><input id="dc" value=""><label>(RU)</label><input id="dcr" value="">
+<label>Цвета дресс-кода через запятую (напр. #1f5a4c,#d4af6a)</label><input id="dcc" value="">
+<label>Подарок: банк</label><input id="gb" value=""><label>Подарок: номер</label><input id="gn" value="">
+<label><input id="cal" type="checkbox" checked style="width:auto"> Кнопка «Добавить в календарь»</label></div>
+<button id="go">Создать ссылку для гостей</button>
+<div class="linkbox" id="linkBox">
+  <div style="font-size:13px;font-weight:600;color:#2d2a26">Готовая ссылка на приглашение для гостей:</div>
+  <input id="shareUrl" type="text" readonly>
+  <div class="link-actions">
+    <button type="button" id="copyLink">Скопировать ссылку</button>
+    <button type="button" class="sec" id="openLink">Открыть приглашение</button>
+  </div>
+  <small id="linkNote">Отправьте эту ссылку гостям в WhatsApp или Telegram — у них сразу откроется готовое приглашение.</small>
+</div>
+<button type="button" class="ghost" id="dlHtml">Скачать HTML-файл (если выбраны фото или музыка)</button>
+<div id="st"></div>
+</div>
+<script type="text/template" id="tpl"><!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e8">
+<title>{{G}} & {{B}} — Үйлөнүү тою</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;500&family=Marck+Script&family=Forum&family=Philosopher&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+:root{--cream:#f5f0e8;--ink:#4c443b;--gold:#a88b61;--soft:#e7ddce}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Montserrat,Arial,sans-serif;text-align:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body.locked{overflow:hidden;height:100vh;height:100svh}
+section{padding:68px 22px;max-width:760px;margin:auto}
+.hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:35px 22px;max-width:none;background:radial-gradient(ellipse at 50% 25%,#e3d4bb,transparent 65%)}
+.kicker{letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:var(--gold)}
+h1,h2{font-family:'Cormorant Garamond',Georgia,serif;font-weight:400}
+h1{font-size:clamp(56px,13vw,100px);line-height:.9;margin:28px 0 15px}
+.amp{font-size:42px;color:var(--gold);display:block;margin:10px}
+h2{font-size:42px;margin:0 0 22px}
+.rule{width:58px;height:1px;background:var(--gold);margin:24px auto}
+.lead{font-family:'Cormorant Garamond',Georgia,serif;font-size:25px;line-height:1.35;max-width:540px;margin:0 auto}
+.small{font-size:12px;letter-spacing:.13em;line-height:2;color:#766b5e}
+.date{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;letter-spacing:.12em;margin:22px 0}
+.card{border:1px solid #cdbb9e;padding:34px 22px;margin:20px auto;max-width:520px;background:#f9f6f0a8}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-width:330px;margin:25px auto 0;font-size:12px}
+.calendar span{padding:8px 0}
+.calendar .day{color:#9b8d7b}
+.calendar .chosen{border:1px solid var(--gold);border-radius:50%;color:#6b5130;font-weight:600}
+.place{font-family:'Cormorant Garamond',serif;font-size:30px}
+.button{display:inline-block;padding:14px 24px;border:1px solid var(--gold);color:var(--ink);text-decoration:none;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:16px}
+.count{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:28px}
+.count div{min-width:75px;padding:15px 8px;border:1px solid #d7c8b2}
+.count strong{display:block;font:32px 'Cormorant Garamond',serif;color:var(--gold)}
+.count small{font-size:9px;letter-spacing:.12em}
+.footer{font:28px 'Cormorant Garamond',serif}
+.music{position:fixed;right:16px;top:calc(16px + env(safe-area-inset-top,0px));border:1px solid var(--gold);background:#f5f0e8ee;color:var(--ink);border-radius:50%;width:44px;height:44px;font-size:17px;z-index:5;cursor:pointer;opacity:0;pointer-events:none;transition:opacity 1s}
+body.opened .music{opacity:1;pointer-events:auto}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity 1.2s ease,transform 1.2s ease}
+.reveal.in{opacity:1;transform:none}
+/* envelope intro */
+#intro{position:fixed;top:0;right:0;bottom:0;left:0;width:100%;height:100%;z-index:20;background:radial-gradient(ellipse at 50% 40%,#f8f3ea,#e6dac6);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.2s ease,visibility 1.2s;cursor:pointer}
+#intro.gone{opacity:0;visibility:hidden}
+.env{position:relative;width:min(320px,82vw);aspect-ratio:3/2;perspective:900px;filter:drop-shadow(0 18px 24px #4c443b30);transition:transform 1s ease}
+.env .back{position:absolute;inset:0;background:#e2d3b8;border-radius:4px}
+.env .paper{position:absolute;left:7%;right:7%;top:8%;bottom:8%;background:#fbf8f2;border:1px solid #d8c9ae;display:flex;align-items:center;justify-content:center;font:22px 'Cormorant Garamond',serif;color:var(--gold);transition:transform 1s ease .5s}
+.env .front{position:absolute;inset:0;background:linear-gradient(135deg,#eadfc9 50%,transparent 50%),linear-gradient(225deg,#e9dcc4 50%,transparent 50%);clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);background-color:#eadfc9;border-radius:4px}
+.env .flap{position:absolute;left:0;right:0;top:0;height:56%;background:#dccbac;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .9s ease;backface-visibility:visible}
+.env .seal{position:absolute;left:50%;top:56%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c2a574,#8c6f43);color:#fff8e8;display:flex;align-items:center;justify-content:center;font:22px 'Cormorant Garamond',serif;box-shadow:0 3px 8px #0003;z-index:3;transition:opacity .4s}
+#intro.open .flap{transform:rotateX(180deg)}
+#intro.open .seal{opacity:0}
+#intro.open .paper{transform:translateY(-38%)}
+#intro.open .env{transform:scale(1.08)}
+.tap{margin-top:34px;letter-spacing:.28em;font-size:10px;color:#766b5e;text-transform:uppercase;animation:pulse 2s ease infinite}
+.names-top{font:34px 'Cormorant Garamond',serif;margin-bottom:34px;color:var(--ink)}
+@keyframes pulse{50%{opacity:.35}}
+section{padding:56px 18px}
+h2{font-size:clamp(30px,8.5vw,42px)}
+.date{font-size:clamp(26px,8vw,34px);letter-spacing:.08em}
+.lead{font-size:clamp(20px,5.6vw,25px)}
+.place{font-size:clamp(24px,7vw,30px)}
+.card{padding:28px 16px}
+.count{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px;margin:28px auto 0}
+.count div{min-width:0;padding:14px 4px}
+.count strong{font-size:clamp(24px,7.5vw,32px)}
+.count small{font-size:8px}
+.button{min-height:46px;display:inline-flex;align-items:center}
+.names-top{font-size:clamp(26px,8vw,34px)}
+*{-webkit-tap-highlight-color:transparent}
+.form{text-align:left}
+.form input,.form select{width:100%;font:16px Montserrat,Arial,sans-serif;color:var(--ink);padding:14px;border:1px solid #cdbb9e;background:#fffdf8;border-radius:0;margin-bottom:14px;-webkit-appearance:none;appearance:none}
+.form label{display:block;font-size:11px;letter-spacing:.12em;color:#766b5e;margin-bottom:6px;text-transform:uppercase}
+.choice{display:grid;gap:10px;margin-bottom:16px}
+.opt,.send{min-height:50px;border:1px solid var(--gold);background:transparent;color:var(--ink);font:13px Montserrat,Arial,sans-serif;letter-spacing:.06em;cursor:pointer;padding:12px}
+.opt.on{background:var(--gold);color:#fff}
+.send{width:100%;background:var(--ink);color:#f5f0e8;border-color:var(--ink);text-transform:uppercase;letter-spacing:.14em;font-size:12px}
+#msg{font-size:13px;color:#766b5e;margin-top:12px;text-align:center;min-height:18px}
+#intro{background:radial-gradient(ellipse at 50% 28%,#fcf9f2 0%,#eee4d0 58%,#dccdb2 100%);padding:40px 24px;text-align:center;transition:transform 1.5s cubic-bezier(.7,0,.2,1)}
+#intro.open{transform:translateY(-100%)}
+#intro.gone{opacity:1;visibility:hidden}
+.frame{position:absolute;top:14px;right:14px;bottom:14px;left:14px;border:1px solid #b99f74;pointer-events:none}
+.frame::after{content:"";position:absolute;top:6px;right:6px;bottom:6px;left:6px;border:1px solid #d6c5a6}
+.c-top,.c-names,.c-line,.c-date,.c-btn,.tap{opacity:0;animation:up 1.4s ease forwards}
+.c-top{letter-spacing:.3em;text-transform:uppercase;font-size:10px;color:var(--gold);animation-delay:.2s}
+.c-names{font:400 clamp(58px,17vw,104px)/.92 'Cormorant Garamond',Georgia,serif;margin:30px 0 8px;color:var(--ink);animation-delay:.5s}
+.c-names span{display:block;font-style:italic;font-size:.45em;color:var(--gold);margin:8px 0}
+.c-line{width:58px;height:1px;background:var(--gold);margin:20px auto;animation-delay:.9s}
+.c-date{font:400 clamp(22px,6vw,28px) 'Cormorant Garamond',Georgia,serif;letter-spacing:.2em;animation-delay:1.1s}
+.c-btn{width:66px;height:66px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:24px;margin:44px auto 18px;position:relative;animation-delay:1.4s}
+.c-btn::after{content:"";position:absolute;top:-1px;right:-1px;bottom:-1px;left:-1px;border:1px solid var(--gold);border-radius:50%;animation:ring 2.2s ease-out infinite}
+.tap{margin-top:0;animation:up 1.4s ease 1.6s forwards,pulse 2.4s ease 3s infinite}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes ring{from{transform:scale(1);opacity:.8}to{transform:scale(1.7);opacity:0}}
+@media(min-width:650px){section{padding:90px 30px}}
+.tl{max-width:420px;margin:24px auto;text-align:left}.tl div{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(128,128,128,.25)}.tl b{font:400 24px 'Cormorant Garamond',serif;color:var(--gold);min-width:74px}.dots{display:flex;gap:10px;justify-content:center;margin-top:18px}.dots i{width:34px;height:34px;border-radius:50%;border:1px solid rgba(128,128,128,.4)}.cp{border:1px solid var(--gold);background:none;color:inherit;padding:13px 22px;font:12px Montserrat,Arial,sans-serif;letter-spacing:.12em;cursor:pointer;margin-top:14px}
+.lang{position:fixed;left:16px;top:calc(16px + env(safe-area-inset-top,0px));z-index:30;display:flex;border:1px solid var(--gold);border-radius:22px;overflow:hidden}.lang button{border:0;background:var(--cream);color:var(--ink);padding:0 13px;height:42px;font:11px Montserrat,Arial,sans-serif;letter-spacing:.1em;cursor:pointer}.lang button.on{background:var(--gold);color:var(--cream)}
+{{THEME_CSS}}
+</style>
+</head>
+<body class="locked">
+<div id="intro">
+  <div class="frame"></div>
+  <div class="c-top">Үйлөнүү тоюна чакыруу</div>
+  <div class="c-names">{{G}}<span>&amp;</span>{{B}}</div>
+  <div class="c-line"></div>
+  <div class="c-date">{{DATE_DOTS}}</div>
+  <div class="c-btn">♡</div>
+  <div class="tap">Ачуу үчүн басыңыз</div>
+</div>
+
+<button class="music" id="music" aria-label="Музыка">♫</button>
+<div class="lang"><button type="button" data-l="ky">KG</button><button type="button" data-l="ru">RU</button></div>
+
+<header class="hero">
+  <div class="kicker reveal">Үйлөнүү тоюна чакыруу</div>
+  <h1 class="reveal">{{G}}<span class="amp">&amp;</span>{{B}}</h1>
+  <div class="rule"></div>
+  <p class="lead reveal">{{T_TAG}}</p>
+  <p class="small" style="margin-top:36px">ТӨМӨНГӨ ЖЫЛДЫРЫҢЫЗ</p>
+  <div style="color:var(--gold);font-size:22px">↓</div>
+</header>
+
+<section class="reveal">
+  <p class="kicker">{{T_KICK}}</p>
+  <h2>{{T_H}}</h2>
+  <div class="rule"></div>
+  <p class="lead">{{T_BODY}}</p>
+  <p class="small" style="margin-top:28px">ТОЙ ЭЭЛЕРИ</p>
+  <p class="place">{{HOSTS}}</p>
+</section>
+
+{{COLLAGE_A}}
+<section class="reveal">
+  <p class="kicker">Биздин өзгөчө күнүбүз</p>
+  <h2>Той күнү</h2>
+  <div class="card">
+    <div class="date">{{DATE_DOTS}}</div>
+    <div class="small">{{MONTH_WD}}</div>
+    <div class="calendar" id="cal"></div>
+  </div>
+  <div class="small">ТОЙДУН БАШТАЛЫШЫ</div>
+  <p class="date">{{TIME}}</p>
+</section>
+
+<section class="reveal">
+  <p class="kicker">Тойдун дареги</p>
+  <h2>Сизди ушул жерден күтөбүз</h2>
+  <div class="card">
+    <div class="place">{{PLACE}}</div>
+    <p class="small">{{ADDR}}</p>
+    <a class="button" href="{{MAP}}" target="_blank" rel="noopener">Картаны ачуу</a>{{CALBTN}}
+  </div>
+</section>
+
+<section class="reveal">
+  <p class="kicker">Кубанычтуу күнгө чейин</p>
+  <h2>Калган убакыт</h2>
+  <div class="count">
+    <div><strong id="days">00</strong><small>КҮН</small></div>
+    <div><strong id="hours">00</strong><small>СААТ</small></div>
+    <div><strong id="minutes">00</strong><small>МҮНӨТ</small></div>
+    <div><strong id="seconds">00</strong><small>СЕКУНД</small></div>
+  </div>
+</section>
+
+{{EXTRA}}
+{{COLLAGE_C}}
+<section class="reveal" id="rsvp">
+  <p class="kicker">Анкета</p>
+  <h2>Келесизби?</h2>
+  <div class="rule"></div>
+  <p class="lead">Келе тургандыгыңызды алдын ала билдирип коюңуз.</p>
+  <div class="card form">
+    <label for="gname">Атыңыз</label>
+    <input id="gname" type="text" placeholder="Аты-жөнүңүз" autocomplete="name">
+    <div class="choice">
+      <button type="button" class="opt" data-v="yes">Келем</button>
+      <button type="button" class="opt" data-v="no">Кечиресиз, келе албайм</button>
+    </div>
+    <div id="cntWrap" style="display:none">
+      <label for="gcount">Канча киши келесиз</label>
+      <select id="gcount"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+    </div>
+    <button type="button" class="send" id="send">Жөнөтүү</button>
+    <div id="msg"></div>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="rule"></div>
+  <p class="lead">{{T_END}}</p>
+  <p class="footer" style="margin-top:28px">{{G}} &amp; {{B}}</p>
+  <p class="small">ТОЙ ЭЭЛЕРИ: {{HOSTS_U}}</p>
+</section>
+
+<script>
+// Calendar: December 2026 starts on Tuesday
+(function(){
+  var h=['ДШ','ШШ','ШР','БШ','ЖМ','ИШ','ЖК'].map(function(d){return '<span class="day">'+d+'</span>'}).join('');
+  var c='';for(var k=0;k<{{OFF}};k++)c+='<span></span>';
+  for(var i=1;i<={{DIM}};i++){c+='<span'+(i==={{D}}?' class="chosen"':'')+'>'+i+'</span>'}
+  document.getElementById('cal').innerHTML=h+c;
+})();
+
+// Countdown (Bishkek, UTC+6)
+var target=new Date('{{ISO}}').getTime();
+function tick(){
+  var d=Math.max(0,target-Date.now());
+  var v={days:Math.floor(d/86400000),hours:Math.floor(d%86400000/3600000),minutes:Math.floor(d%3600000/60000),seconds:Math.floor(d%60000/1000)};
+  for(var k in v)document.getElementById(k).textContent=String(v[k]).padStart(2,'0');
+}
+tick();setInterval(tick,1000);
+
+// Scroll reveal
+var io=window.IntersectionObserver?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15}):null;
+function startReveal(){var l=document.querySelectorAll('.reveal');for(var i=0;i<l.length;i++){if(io)io.observe(l[i]);else l[i].classList.add('in')}}
+
+// Music: embedded MP3 (starts at 0:15 of the track), decoded with Web Audio
+var AUDIO_B64="{{AUDIO}}";
+var ctx=null,buf=null,src=null,playing=false,wantPlay=false;
+try{
+  ctx=new(window.AudioContext||window.webkitAudioContext)();
+  var bin=atob(AUDIO_B64),u8=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+  if(AUDIO_B64)ctx.decodeAudioData(u8.buffer,function(b){buf=b;if(wantPlay)begin()},function(){});
+}catch(e){}
+if(!AUDIO_B64){document.getElementById('music').style.display='none'}
+function begin(){
+  if(!ctx||!buf||src)return;
+  src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
+  var gn=ctx.createGain();gn.gain.setValueAtTime(0,ctx.currentTime);gn.gain.linearRampToValueAtTime(1,ctx.currentTime+1.5);src.connect(gn);gn.connect(ctx.destination);var st={{START}};if(st>=buf.duration)st=0;src.loopStart=st;src.loopEnd=buf.duration;src.start(0,st);
+}
+function startMusic(){
+  if(!ctx)return;
+  wantPlay=true;playing=true;
+  ctx.resume();begin();
+  document.getElementById('music').textContent='Ⅱ';
+}
+function stopMusic(){
+  playing=false;wantPlay=false;
+  if(ctx)ctx.suspend();
+  document.getElementById('music').textContent='♫';
+}
+document.getElementById('music').addEventListener('click',function(){playing?stopMusic():startMusic()});
+
+// RSVP: sends the answer to the host via WhatsApp
+var HOST_PHONE='{{PHONE}}';
+var rsvp=null;
+document.querySelectorAll('.opt').forEach(function(b){
+  b.addEventListener('click',function(){
+    rsvp=b.getAttribute('data-v');
+    document.querySelectorAll('.opt').forEach(function(x){x.classList.toggle('on',x===b)});
+    document.getElementById('cntWrap').style.display=rsvp==='yes'?'block':'none';
+  });
+});
+document.getElementById('send').addEventListener('click',function(){
+  var name=document.getElementById('gname').value.trim(),m=document.getElementById('msg');
+  if(!name){m.textContent=RR[CUR].n;return}
+  if(!rsvp){m.textContent=RR[CUR].c;return}
+  var t=RR[CUR].h+name+': '+(rsvp==='yes'?RR[CUR].y.replace('N',document.getElementById('gcount').value):RR[CUR].no);
+  var url='https://wa.me/'+HOST_PHONE+'?text='+encodeURIComponent(t);
+  m.textContent=RR[CUR].ok;
+  window.open(url,'_blank');
+});
+
+function copyGift(v,el){var o=el.textContent;function ok(){el.textContent='✓';setTimeout(function(){el.textContent=o},1500)}
+try{navigator.clipboard.writeText(v).then(ok,function(){prompt('',v)})}catch(e){prompt('',v)}}
+var RR={ky:{n:'Сураныч, атыңызды жазыңыз.',c:'Сураныч, жоопту тандаңыз.',h:'Саламатсызбы! {{G_J}} & {{B_J}} — үйлөнүү тою ({{DATE_DMY}}). ',y:'Келем (N киши).',no:'Кечиресиз, келе албайм.',ok:'Рахмат! WhatsApp ачылат, билдирүүнү жөнөтүп коюңуз.'},
+ru:{n:'Пожалуйста, впишите ваше имя.',c:'Пожалуйста, выберите ответ.',h:'Здравствуйте! Свадьба {{G_J}} и {{B_J}} ({{DATE_DMY}}). ',y:'Приду (N чел.).',no:'К сожалению, не смогу.',ok:'Спасибо! Откроется WhatsApp, отправьте сообщение.'}};
+var DICT={{LANGDICT}},CUR='{{LANG}}',LN=[];
+(function(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false),n;
+while(n=w.nextNode()){var k=n.nodeValue.trim();if(k&&DICT[k]!==undefined)LN.push([n,n.nodeValue,k])}})();
+function setLang(l){CUR=l;
+for(var i=0;i<LN.length;i++){var x=LN[i];x[0].nodeValue=l==='ru'?x[1].replace(x[2],DICT[x[2]]):x[1]}
+var gi=document.getElementById('gname');if(gi)gi.placeholder=l==='ru'?'Ваше имя':'Аты-жөнүңүз';
+document.documentElement.lang=l==='ru'?'ru':'ky';
+var bs=document.querySelectorAll('.lang button');for(var j=0;j<bs.length;j++)bs[j].className=bs[j].getAttribute('data-l')===l?'on':'';}
+(function(){var bs=document.querySelectorAll('.lang button');for(var j=0;j<bs.length;j++)bs[j].addEventListener('click',function(){setLang(this.getAttribute('data-l'))});setLang(CUR)})();
+// Open envelope
+var intro=document.getElementById('intro'),opened=false;
+intro.addEventListener('click',function(){
+  if(opened)return;opened=true;
+  intro.classList.add('open');
+  try{startMusic()}catch(e){}
+  setTimeout(function(){
+    intro.classList.add('gone');
+    document.body.classList.remove('locked');
+    document.body.classList.add('opened');
+    startReveal();
+  },1900);
+});
+<\/script>
+</body>
+</html>
+</script>
+<script>
+function $(i){return document.getElementById(i)}
+var MO=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var WD=['ДҮЙШӨМБҮ','ШЕЙШЕМБИ','ШАРШЕМБИ','БЕЙШЕМБИ','ЖУМА','ИШЕМБИ','ЖЕКШЕМБИ'];
+// bg ink gold muted card line inputBg | cover gradient, cover ink, cover accent
+var TH={
+ro:{bg:'#fbf1ef',ink:'#5a3a40',g:'#c98d97',mu:'#9a7b80',cd:'rgba(255,255,255,.7)',ln:'#ecd2d2',ib:'#fff',cg:'radial-gradient(ellipse at 50% 30%,#fff7f5 0%,#f6dedd 60%,#ebc7c9 100%)',ci:'#5a3a40',ca:'#c98d97',hf:"'Cormorant Garamond',serif",tf:"'Cormorant Garamond',serif",or:'❀',bd:'1px solid #ecd2d2',r:'22px',rb:'30px',hs:'h1,h2,.c-names{font-style:italic;font-weight:500}',cv:'.frame{border-radius:50px}.frame::after{border-style:dashed;border-radius:44px}.c-names{font-size:clamp(50px,14vw,84px)}'},
+sk:{bg:'#f2f7fc',ink:'#2d4263',g:'#b99a5b',mu:'#6f819b',cd:'rgba(255,255,255,.75)',ln:'#cfdcec',ib:'#fff',cg:'radial-gradient(ellipse at 50% 30%,#fff 0%,#dce9f7 60%,#c4d9ef 100%)',ci:'#2d4263',ca:'#b99a5b',hf:"'Playfair Display',Georgia,serif",tf:"'Cormorant Garamond',serif",or:'✦',bd:'1px solid #cfdcec',r:'18px',rb:'12px',hs:'',cv:'.frame{top:18px;bottom:18px;left:18px;right:18px;border-radius:0}.frame::after{display:none}.c-names{font-size:clamp(50px,14.5vw,88px)}'},
+nv:{bg:'#101a33',ink:'#eadfc7',g:'#cfa95e',mu:'#9fb0cc',cd:'rgba(255,255,255,.05)',ln:'#4a5a80',ib:'#0b1327',cg:'radial-gradient(ellipse at 50% 30%,#26386b 0%,#101a33 60%,#080e20 100%)',ci:'#eadfc7',ca:'#cfa95e',hf:"Forum,'Cormorant Garamond',serif",tf:"'Cormorant Garamond',serif",or:'✧',bd:'1px solid #4a5a80',r:'4px',rb:'4px',hs:'h1,h2{letter-spacing:.06em}',cv:'.frame{border-width:3px;border-style:double;border-radius:0}.frame::after{display:none}.c-names{text-transform:uppercase;letter-spacing:.1em;font-size:clamp(32px,9.5vw,54px);line-height:1.2}.c-names span{text-transform:none}'},
+mn:{bg:'#ffffff',ink:'#151515',g:'#151515',mu:'#7a7a7a',cd:'#fafafa',ln:'#dddddd',ib:'#fff',cg:'#fff',ci:'#151515',ca:'#151515',hf:"Montserrat,Arial,sans-serif",tf:"Montserrat,Arial,sans-serif",or:'—',bd:'1px solid #dddddd',r:'0',rb:'0',hs:'h1,h2{text-transform:uppercase;letter-spacing:.14em;font-weight:300}h1{font-size:clamp(30px,9vw,60px)}h2{font-size:24px}.lead{font-weight:300;font-size:clamp(16px,4.6vw,19px);line-height:1.7}.amp{font-size:22px}',cv:'.frame{display:none}.c-names{font-weight:300;text-transform:uppercase;letter-spacing:.16em;font-size:clamp(28px,8.5vw,50px)}.c-names span{margin:14px 0}'},
+lv:{bg:'#f5f1fa',ink:'#473a63',g:'#9a84c7',mu:'#85789f',cd:'rgba(255,255,255,.7)',ln:'#ddd2ee',ib:'#fff',cg:'radial-gradient(ellipse at 50% 30%,#fcf9ff 0%,#e8dff5 60%,#d6c8ec 100%)',ci:'#473a63',ca:'#9a84c7',hf:"Philosopher,'Cormorant Garamond',serif",tf:"'Cormorant Garamond',serif",or:'❁',bd:'1px solid #ddd2ee',r:'30px',rb:'28px',hs:'h1{font-size:clamp(46px,13vw,80px)}',cv:'.frame{border-width:2px;border-radius:38px 4px 38px 4px}.frame::after{border-radius:32px 2px 32px 2px}.c-names{font-size:clamp(46px,13.5vw,80px)}'},
+em:{bg:'#0f3b33',ink:'#f1e6c8',g:'#d4af6a',mu:'#b9c7b4',cd:'rgba(255,255,255,.05)',ln:'#8a7a4c',ib:'#0c2f29',cg:'radial-gradient(ellipse at 50% 30%,#1d5f50 0%,#0f3b33 60%,#082a24 100%)',ci:'#f1e6c8',ca:'#d4af6a',
+ hf:"'Playfair Display',Georgia,serif",tf:"'Cormorant Garamond',Georgia,serif",or:'—  ◆  —',bd:'1px solid #8a7a4c',r:'24px',rb:'40px',hs:'',
+ cv:'.frame,.frame::after{border-radius:28px}.c-names{font-size:clamp(50px,14.5vw,88px)}'},
+bu:{bg:'#f4eadc',ink:'#5b1a2b',g:'#9a3b50',mu:'#8a6a6a',cd:'rgba(255,255,255,.55)',ln:'#c9a898',ib:'#fffaf2',cg:'radial-gradient(ellipse at 50% 30%,#7d2a40 0%,#5b1a2b 60%,#3f1020 100%)',ci:'#f4eadc',ca:'#e3c9a6',
+ hf:"'Marck Script','Cormorant Garamond',cursive",tf:"'Cormorant Garamond',Georgia,serif",or:'❦',bd:'4px double #c9a898',r:'0',rb:'0',hs:'h1{font-size:clamp(50px,14vw,88px)}h2{font-size:44px}.amp{font-family:Georgia,serif;font-style:italic}',
+ cv:'#intro{padding:100px 56px}.frame{top:4%;bottom:4%;left:7%;right:7%;border-radius:999px 999px 0 0}.frame::after{border-radius:999px 999px 0 0}.c-names{font-size:clamp(42px,12vw,68px);line-height:1.1}.c-top{margin-top:28px}.c-names span{font-family:Georgia,serif}'},
+eu:{bg:'#eef2ea',ink:'#34453a',g:'#6f9174',mu:'#68796d',cd:'rgba(255,255,255,.6)',ln:'#b7c8b5',ib:'#fbfdf9',cg:'radial-gradient(ellipse at 50% 30%,#f8fbf4 0%,#e1eadb 60%,#cbd9c4 100%)',ci:'#34453a',ca:'#6f9174',
+ hf:"Forum,'Cormorant Garamond',serif",tf:"Montserrat,Arial,sans-serif",or:'❧',bd:'0',r:'34px',rb:'30px',hs:'h1,h2{text-transform:uppercase;letter-spacing:.08em}h1{font-size:clamp(38px,10.5vw,72px)}h2{font-size:28px}.amp{text-transform:none}.lead{font-weight:300;font-size:clamp(17px,4.8vw,21px);line-height:1.6}.card{box-shadow:0 14px 34px rgba(52,69,58,.12)}',
+ cv:'.frame{top:7%;bottom:7%;left:5%;right:5%;border-radius:50%}.frame::after{border-radius:50%}.c-names{font-size:clamp(34px,10vw,58px);text-transform:uppercase;letter-spacing:.08em;line-height:1.2}.c-names span{text-transform:none;letter-spacing:0}.c-date{letter-spacing:.14em}'}};
+var BRN=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'%3E%3Cpath d='M0 10C60 20 110 60 190 150' stroke='%236f9174' stroke-width='2' fill='none'/%3E%3Cg fill='%238fae92'%3E%3Ccircle cx='40' cy='22' r='11'/%3E%3Ccircle cx='70' cy='42' r='13'/%3E%3Ccircle cx='100' cy='66' r='12'/%3E%3Ccircle cx='128' cy='92' r='13'/%3E%3Ccircle cx='158' cy='122' r='12'/%3E%3Ccircle cx='30' cy='46' r='10'/%3E%3Ccircle cx='58' cy='70' r='11'/%3E%3Ccircle cx='88' cy='96' r='12'/%3E%3Ccircle cx='116' cy='122' r='10'/%3E%3C/g%3E%3C/svg%3E")`;
+var LAV=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 120'%3E%3Cpath d='M30 120V30' stroke='%238a9a6a' stroke-width='2'/%3E%3Cg fill='%239a84c7'%3E%3Cellipse cx='30' cy='14' rx='5' ry='9'/%3E%3Cellipse cx='23' cy='28' rx='5' ry='9' transform='rotate(-20 23 28)'/%3E%3Cellipse cx='37' cy='28' rx='5' ry='9' transform='rotate(20 37 28)'/%3E%3Cellipse cx='22' cy='46' rx='5' ry='9' transform='rotate(-20 22 46)'/%3E%3Cellipse cx='38' cy='46' rx='5' ry='9' transform='rotate(20 38 46)'/%3E%3Cellipse cx='30' cy='42' rx='5' ry='9'/%3E%3C/g%3E%3C/svg%3E")`;
+var CVZ='@keyframes fall{to{transform:translateY(50%)}}@keyframes drift{from{transform:translateX(-8%)}to{transform:translateX(8%)}}@keyframes tw{from{opacity:.3}to{opacity:1}}#intro>.c-top,#intro>.c-names,#intro>.c-line,#intro>.c-date,#intro>.tap{position:relative;z-index:2}.c-btn{z-index:2}#intro::before,#intro::after{content:"";position:absolute;z-index:1;pointer-events:none}';
+var PET='radial-gradient(ellipse 6px 10px at 9% 12%,#e8b4bc 95%,transparent),radial-gradient(ellipse 5px 8px at 27% 38%,#f1c9cd 95%,transparent),radial-gradient(ellipse 7px 11px at 46% 8%,#e8b4bc 95%,transparent),radial-gradient(ellipse 5px 9px at 63% 30%,#f4d3d6 95%,transparent),radial-gradient(ellipse 6px 10px at 81% 15%,#e8b4bc 95%,transparent),radial-gradient(ellipse 5px 8px at 92% 42%,#f1c9cd 95%,transparent),radial-gradient(ellipse 6px 10px at 18% 70%,#f4d3d6 95%,transparent),radial-gradient(ellipse 7px 11px at 55% 62%,#e8b4bc 95%,transparent),radial-gradient(ellipse 5px 9px at 74% 85%,#f1c9cd 95%,transparent),radial-gradient(ellipse 6px 10px at 36% 92%,#e8b4bc 95%,transparent)';
+var STR='radial-gradient(1.5px 1.5px at 12% 18%,#fff 95%,transparent),radial-gradient(1px 1px at 33% 8%,#fff 95%,transparent),radial-gradient(2px 2px at 78% 14%,#f6e4b0 95%,transparent),radial-gradient(1px 1px at 55% 30%,#fff 95%,transparent),radial-gradient(1.5px 1.5px at 90% 40%,#fff 95%,transparent),radial-gradient(1px 1px at 20% 60%,#fff 95%,transparent),radial-gradient(2px 2px at 65% 72%,#f6e4b0 95%,transparent),radial-gradient(1px 1px at 40% 88%,#fff 95%,transparent),radial-gradient(1.5px 1.5px at 85% 92%,#fff 95%,transparent),radial-gradient(1px 1px at 8% 85%,#fff 95%,transparent),radial-gradient(1px 1px at 48% 50%,#fff 95%,transparent)';
+var CLD='radial-gradient(ellipse 90px 28px at 20% 18%,rgba(255,255,255,.95) 70%,transparent 74%),radial-gradient(ellipse 120px 34px at 70% 30%,rgba(255,255,255,.9) 70%,transparent 74%),radial-gradient(ellipse 100px 30px at 40% 80%,rgba(255,255,255,.9) 70%,transparent 74%),radial-gradient(ellipse 140px 38px at 85% 90%,rgba(255,255,255,.95) 70%,transparent 74%)';
+var CV={
+em:'#intro{background:transparent}.frame{display:none}#intro::before,#intro::after{top:0;bottom:0;width:50%;transition:transform 1.4s cubic-bezier(.7,0,.2,1);background:repeating-linear-gradient(90deg,#0f3b33 0 16px,#14503f 16px 32px)}#intro::before{left:0;border-right:3px solid #d4af6a}#intro::after{right:0;border-left:3px solid #d4af6a}#intro.open{transform:none}#intro.open::before{transform:translateX(-101%)}#intro.open::after{transform:translateX(101%)}#intro.open>*{animation:none!important;opacity:0}',
+bu:'#intro{background:#5b1a2b;justify-content:flex-start;padding-top:49vh;transition:transform 1.3s cubic-bezier(.7,0,.2,1) .55s}.frame,.c-top{display:none}#intro::before{left:0;right:0;top:0;height:45%;background:#7e2c42;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform 1s ease;z-index:3}#intro::after{left:0;right:0;bottom:0;height:38%;background:#6a2237;clip-path:polygon(0 100%,100% 100%,50% 0)}#intro.open::before{transform:rotateX(180deg)}.c-names{font-size:clamp(36px,11vw,58px)!important;margin-top:10px}.c-btn{position:absolute;top:45%;left:50%;margin:-35px 0 0 -35px;width:70px;height:70px;background:radial-gradient(circle at 35% 30%,#ecd5ab,#b98e55);border:0;color:#5b1a2b;z-index:4}.c-btn::after{border-color:#e3c9a6}.tap{margin-top:16px}',
+eu:'#intro{transition:opacity 1.3s ease}#intro.open{transform:none;opacity:0}#intro::before{top:0;left:0;width:64%;height:42%;background:'+BRN+' no-repeat left top/contain}#intro::after{bottom:0;right:0;width:64%;height:42%;background:'+BRN+' no-repeat left top/contain;transform:rotate(180deg)}',
+ro:'#intro{transition:opacity 1.3s ease}#intro.open{transform:none;opacity:0}#intro::before{left:0;right:0;top:-100%;height:200%;background:'+PET+';background-size:100% 50%;animation:fall 10s linear infinite}',
+sk:'#intro::before{left:-50%;right:-50%;top:0;bottom:0;background:'+CLD+';animation:drift 22s ease-in-out infinite alternate}',
+nv:'#intro{transition:opacity 1.4s ease,transform 1.4s ease}#intro.open{transform:scale(1.15);opacity:0}#intro::before{left:0;right:0;top:0;bottom:0;background:'+STR+';animation:tw 3.5s ease-in-out infinite alternate}#intro::after{top:6%;right:11%;width:64px;height:64px;border-radius:50%;box-shadow:inset -16px 0 0 0 #eadfc7}',
+lv:'#intro::before{left:0;right:0;bottom:0;height:140px;background:'+LAV+' repeat-x left bottom/64px 128px}#intro::after{left:0;right:0;top:0;height:140px;background:'+LAV+' repeat-x left bottom/64px 128px;transform:rotate(180deg)}',
+mn:'#intro::before{content:"@INI@";left:50%;top:50%;transform:translate(-50%,-50%);font:200 min(80vw,430px)/1 Montserrat,Arial,sans-serif;color:transparent;-webkit-text-stroke:1px #e6e6e6;white-space:nowrap;letter-spacing:-.05em}#intro::after{display:none}'};
+var COLCSS=`.col{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:clamp(96px,27vw,150px);gap:8px;max-width:520px;margin:26px auto 0}.col img{width:100%;height:100%;object-fit:cover;display:block;border-radius:var(--rad);box-shadow:0 6px 18px rgba(0,0,0,.14)}.col .a{grid-area:a}.col .b{grid-area:b}.col .c{grid-area:c}.col .d{grid-area:d}.col .e{grid-area:e}.col .f{grid-area:f}.n1{grid-template-columns:1fr;grid-auto-rows:clamp(280px,84vw,440px)}.n2{grid-template-columns:1fr 1fr;grid-template-areas:"a b";grid-auto-rows:clamp(210px,62vw,330px)}.n3{grid-template-areas:"a a b" "a a c"}.n4{grid-template-areas:"a a b" "a a c" "d d d"}.n5{grid-template-areas:"a a b" "a a c" "d e e"}.n6{grid-template-areas:"a a b" "a a c" "d e f"}`;
+function themeCss(k,img,ini){var c=TH[k],ci=c.ci,ca=c.ca,bgc=c.cg;
+ if(img){ci='#fff';ca='#fff';bgc="linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.45)),url("+img+") center/cover no-repeat"}
+ return ':root{--cream:'+c.bg+';--ink:'+c.ink+';--gold:'+c.g+';--rad:'+c.r+'}'+COLCSS+'body{background:'+c.bg+';color:'+c.ink+'}'
+ +'.hero{background:radial-gradient(ellipse at 50% 25%,'+c.cd+',transparent 65%)}.small,.form label,#msg{color:'+c.mu+'}.calendar .day{color:'+c.mu+'}'
+ +'.card{border:'+c.bd+';border-radius:'+c.r+';background:'+c.cd+'}.calendar .chosen{color:'+c.ink+'}.count div{border-color:'+c.ln+'}.button{color:'+c.ink+'}'
+ +'.button,.cp,.opt,.send,.form input,.form select,.count div{border-radius:'+c.rb+'}'
+ +'h1,h2,.c-names,.footer,.place,.date,.c-date,.count strong{font-family:'+c.hf+'}.lead,.tl b{font-family:'+c.tf+'}'
+ +'.rule{width:auto;height:auto;background:none;color:'+c.g+';font-size:16px;letter-spacing:.3em;line-height:1}.rule::before{content:"'+c.or+'"}'+c.hs
+ +'.music{background:'+c.bg+';color:'+c.ink+'}.form input,.form select{background:'+c.ib+';color:'+c.ink+';border-color:'+c.ln+'}'
+ +'.opt{color:'+c.ink+'}.opt.on,.send{background:'+c.g+';color:'+c.bg+';border-color:'+c.g+'}'
+ +'#intro{background:'+bgc+'}.c-top,.tap{color:'+ca+'}.c-names,.c-date{color:'+ci+'}.c-names span{color:'+ca+'}.c-line{background:'+ca+'}.c-btn{color:'+ca+';border-color:'+ca+'}.c-btn::after{border-color:'+ca+'}.frame{border-color:'+ca+'}.frame::after{border-color:'+ca+'}'+c.cv+(img?'':CVZ+(CV[k]||'').replace('@INI@',ini));}
+function esc(s){return s.replace(/&amp;/g,'&').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function js(s){return s.replace(/\/g,'\\').replace(/'/g,"\'").replace(/"/g,'\"').replace(/[
+]+/g,' ').replace(/</g,'\x3c')}
+function pad(n){return (n<10?'0':'')+n}
+function ics(d,g,b,pl,ad){var s=new Date(d),e=new Date(s.getTime()+4*3600000);function f(x){return x.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z'}
+ return 'BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:'+f(s)+'
+DTEND:'+f(e)+'
+SUMMARY:'+g+' & '+b+'
+LOCATION:'+pl+', '+ad+'
+END:VEVENT
+END:VCALENDAR'}
+var DX={};
+function col(p){return '<section class="reveal"><p class="kicker">Сүрөттөр</p><h2>Биздин учурлар</h2><div class="rule"></div><div class="col n'+p.length+'">'+p.map(function(u,i){return '<img class="'+'abcdef'.charAt(i)+'" alt="" src="'+u+'">'}).join('')+'</div></section>
+'}
+function shrink(f,w,q,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var W=Math.min(w,im.width),H=Math.round(im.height*W/im.width),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);cb(c.toDataURL('image/jpeg',q))};im.onerror=function(){cb('')};im.src=r.result};r.onerror=function(){cb('')};r.readAsDataURL(f)}
+function readM(fs,cb){var out=[],i=0;(function nx(){if(i>=fs.length)return cb(out.filter(Boolean));shrink(fs[i++],720,.72,function(u){out.push(u);nx()})})()}
+function extra(cfg){var o='',L=(cfg.pr||'').split('
+').filter(function(x){return x.indexOf('|')>0});
+ if(L.length)o+='<section class="reveal"><p class="kicker">Программа</p><h2>Күндүн программасы</h2><div class="tl">'+L.map(function(x){var p=x.split('|');var kg=(p[1]||'').trim(),ru=(p[2]||'').trim();if(ru)DX[kg]=ru;return '<div><b>'+esc(p[0].trim())+'</b><span>'+esc(kg)+'</span></div>'}).join('')+'</div></section>
+';
+ var dc=(cfg.dc||'').trim(),cs=(cfg.dcc||'').split(',').map(function(x){return x.trim()}).filter(function(x){return /^#[0-9a-f]{3,8}$/i.test(x)});
+ if(dc&&(cfg.dcr||'').trim())DX[dc]=(cfg.dcr||'').trim();
+ if(dc||cs.length)o+='<section class="reveal"><p class="kicker">Кийим коду</p><h2>'+esc(dc||'Дресс-код')+'</h2><div class="dots">'+cs.map(function(c){return '<i style="background:'+c+'"></i>'}).join('')+'</div></section>
+';
+ var gn=(cfg.gn||'').trim();
+ if(gn)o+='<section class="reveal"><p class="kicker">Белек</p><h2>Жаштарга белек</h2><div class="card"><div class="small">'+esc((cfg.gb||'').trim())+'</div><p class="place">'+esc(gn)+'</p><button type="button" class="cp" onclick="copyGift(''+js(gn)+'',this)">Номерди көчүрүү</button></div></section>
+';
+ return o}
+var WDR=['ПОНЕДЕЛЬНИК','ВТОРНИК','СРЕДА','ЧЕТВЕРГ','ПЯТНИЦА','СУББОТА','ВОСКРЕСЕНЬЕ'];
+var FIX=[['Сүрөттөр','Фото'],['Биздин учурлар','Наши моменты'],['Үйлөнүү тоюна чакыруу','Приглашение на свадьбу'],['Ачуу үчүн басыңыз','Нажмите, чтобы открыть'],['ТӨМӨНГӨ ЖЫЛДЫРЫҢЫЗ','ЛИСТАЙТЕ ВНИЗ'],['ТОЙ ЭЭЛЕРИ','ХОЗЯЕВА ТОРЖЕСТВА'],['Биздин өзгөчө күнүбүз','Наш особенный день'],['Той күнү','Дата свадьбы'],['ТОЙДУН БАШТАЛЫШЫ','НАЧАЛО'],['Тойдун дареги','Место'],['Сизди ушул жерден күтөбүз','Ждём вас здесь'],['Картаны ачуу','Открыть карту'],['Календарга кошуу','Добавить в календарь'],['Кубанычтуу күнгө чейин','До радостного дня'],['Калган убакыт','Осталось времени'],['КҮН','ДНЕЙ'],['СААТ','ЧАСОВ'],['МҮНӨТ','МИНУТ'],['СЕКУНД','СЕКУНД'],['ДШ','ПН'],['ШШ','ВТ'],['ШР','СР'],['БШ','ЧТ'],['ЖМ','ПТ'],['ИШ','СБ'],['ЖК','ВС'],['Анкета','Анкета'],['Келесизби?','Придёте?'],['Келе тургандыгыңызды алдын ала билдирип коюңуз.','Пожалуйста, сообщите заранее, сможете ли прийти.'],['Атыңыз','Ваше имя'],['Келем','Приду'],['Кечиресиз, келе албайм','К сожалению, не смогу'],['Канча киши келесиз','Сколько человек придёт'],['Жөнөтүү','Отправить'],['Программа','Программа'],['Күндүн программасы','Программа дня'],['Кийим коду','Дресс-код'],['Белек','Подарок'],['Жаштарга белек','Подарок молодожёнам'],['Номерди көчүрүү','Скопировать номер']];
+function getFormConfig(){
+  return {
+    g:$('g').value.trim(),b:$('b').value.trim(),bg:$('bg').value.trim()||$('b').value.trim(),h:$('h').value.trim(),
+    d:$('d').value,t:$('t').value||'17:00',p:$('p').value.trim(),a:$('a').value.trim(),m:$('m').value.trim(),tz:$('tz').value.trim()||'+06:00',
+    ph:$('ph').value.trim(),ms:+$('ms').value||0,lg:$('lg').value,
+    tk:$('tk').value.trim(),tr:$('tr').value.trim(),kk:$('kk').value.trim(),kr:$('kr').value.trim(),
+    hk:$('hk').value.trim(),hr:$('hr').value.trim(),bk:$('bk').value,br:$('br').value,
+    ek:$('ek').value.trim(),er:$('er').value.trim(),th:$('th').value,pp:$('pp').value,
+    pr:$('pr').value,dc:$('dc').value.trim(),dcr:$('dcr').value.trim(),dcc:$('dcc').value.trim(),
+    gb:$('gb').value.trim(),gn:$('gn').value.trim(),cal:$('cal').checked?1:0
+  };
+}
+function buildFromConfig(cfg,audio,img,pics){DX={};
+  var g=cfg.g,b=cfg.b,bg=cfg.bg||b,hs=cfg.h;
+  var dv=cfg.d.split('-'),y=+dv[0],m=+dv[1],d=+dv[2];
+  var wd=(new Date(y,m-1,d).getDay()+6)%7,off=(new Date(y,m-1,1).getDay()+6)%7,dim=new Date(y,m,0).getDate();
+  var tm=cfg.t||'17:00',tz=cfg.tz||'+06:00',iso=y+'-'+pad(m)+'-'+pad(d)+'T'+tm+':00'+tz;
+  var ph=cfg.ph.replace(/\D/g,''),pl=cfg.p,ad=cfg.a;
+  var mp=cfg.m||('https://2gis.kg/bishkek/search/'+encodeURIComponent(ad+' '+pl));
+  var cb=cfg.cal?'<a class="button" download="toy.ics" href="data:text/calendar;charset=utf-8,'+encodeURIComponent(ics(iso,g,b,pl,ad))+'">Календарга кошуу</a>':'';
+  function tok(x){return (x||'').replace(/\{BG\}/g,bg).replace(/\{G\}/g,g).replace(/\{B\}/g,b)}
+  var D={};FIX.forEach(function(p){D[p[0]]=p[1]});
+  var pairs=[['tk','tr'],['kk','kr'],['hk','hr'],['bk','br'],['ek','er']],TT={};
+  pairs.forEach(function(p){var a=tok(cfg[p[0]]),c=tok(cfg[p[1]]);TT[p[0]]=a;if(a&&c)D[a]=c});
+  D[MO[m-1].toUpperCase()+' · '+WD[wd]]=MO[m-1].toUpperCase()+' · '+WDR[wd];
+  D['ТОЙ ЭЭЛЕРИ: '+hs.toUpperCase()]='ХОЗЯЕВА: '+hs.toUpperCase();
+  var ex=extra(cfg);for(var q in DX)D[q]=DX[q];
+  var v={T_TAG:esc(TT.tk),T_KICK:esc(TT.kk),T_H:esc(TT.hk),T_BODY:esc(TT.bk),T_END:esc(TT.ek),LANG:cfg.lg||'ky',LANGDICT:JSON.stringify(D).replace(/</g,'\u003c'),G:esc(g),B:esc(b),BG:esc(bg),HOSTS:esc(hs),HOSTS_U:esc(hs).toUpperCase(),
+    DATE_DOTS:pad(d)+' · '+pad(m)+' · '+y,MONTH_WD:MO[m-1].toUpperCase()+' · '+WD[wd],TIME:tm,
+    PLACE:esc(pl),ADDR:esc(ad),MAP:esc(mp),ISO:iso,PHONE:ph,
+    G_J:js(g),B_J:js(b),DATE_DMY:pad(d)+'.'+pad(m)+'.'+y,OFF:off,DIM:dim,D:d,START:+(cfg.ms)||0,
+    EXTRA:ex,COLLAGE_A:(pics&&pics.length&&cfg.pp==='a')?col(pics):'',COLLAGE_C:(pics&&pics.length&&cfg.pp==='c')?col(pics):'',CALBTN:cb,THEME_CSS:themeCss(cfg.th||'em',img,(g[0]+'&'+b[0]).toUpperCase()),AUDIO:audio||''};
+  var out=$('tpl').textContent.replace(/<\\/script>/g,'<'+'/script>');
+  for(var k in v)out=out.split('{{'+k+'}}').join(String(v[k]));
+  return out;}
+function encodeShareData(cfg){
+  var json=JSON.stringify(cfg);
+  var bytes=new TextEncoder().encode(json);
+  var bin='';for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeShareData(token){
+  if(!token)return null;
+  var b64=token.replace(/-/g,'+').replace(/_/g,'/');
+  while(b64.length%4)b64+='=';
+  var bin=atob(b64);
+  var bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function renderInvitationIntoPage(html){
+  document.open();
+  document.write(html);
+  document.close();
+}
+function save(html){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='index.html';document.body.appendChild(a);a.click();document.body.removeChild(a);
+ $('st').style.color='#2a7a3b';$('st').textContent='Готово: index.html скачан.';}
+function readA(f,cb){if(!f)return cb('');var r=new FileReader();r.onload=function(){cb(String(r.result).split(',')[1]||'')};r.onerror=function(){$('st').textContent='Не смог прочитать mp3.'};r.readAsDataURL(f)}
+function readI(f,cb){if(!f)return cb('');var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(900,im.width),h=Math.round(im.height*w/im.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);cb(c.toDataURL('image/jpeg',.72))};im.onerror=function(){cb('')};im.src=r.result};r.readAsDataURL(f)}
+
+(function(){
+  var h=location.hash||'';
+  var m=h.match(/inv=([^&]+)/);
+  if(m){
+    try{
+      var cfg=decodeShareData(m[1]);
+      if(cfg&&cfg.g&&cfg.b&&cfg.d){
+        var invHtml=buildFromConfig(cfg,'','',[]);
+        renderInvitationIntoPage(invHtml);
+        return;
+      }
+    }catch(e){}
+  }
+})();
+
+$('go').onclick=function(){
+  $('st').style.color='#a33';$('st').textContent='';
+  if(!$('g').value.trim()||!$('b').value.trim()||!$('d').value||!$('ph').value.trim()){$('st').textContent='Заполните имена, дату и номер WhatsApp.';return}
+  var cfg=getFormConfig();
+  var token=encodeShareData(cfg);
+  var baseUrl=location.href.split('#')[0];
+  var fullUrl=baseUrl+'#inv='+token;
+  $('shareUrl').value=fullUrl;
+  $('linkBox').style.display='block';
+  var hasMedia=!!($('mp').files[0]||$('cv').files[0]||($('pics').files&&$('pics').files.length));
+  $('linkNote').textContent=hasMedia
+    ? 'Ссылка сформирована (без тяжёлых файлов фото/mp3). Если в приглашении важны фото или музыка — скачайте готовый HTML-файл ниже.'
+    : 'Отправьте эту ссылку гостям в WhatsApp или Telegram — у них сразу откроется готовое приглашение.';
+  $('st').style.color='#2a7a3b';
+  $('st').textContent='Ссылка для гостей готова!';
+};
+$('copyLink').onclick=function(){
+  var u=$('shareUrl').value;if(!u)return;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(u).then(function(){$('st').style.color='#2a7a3b';$('st').textContent='Ссылка скопирована в буфер обмена.';},function(){prompt('Скопируйте ссылку:',u)});
+  }else{prompt('Скопируйте ссылку:',u)}
+};
+$('openLink').onclick=function(){
+  var u=$('shareUrl').value;if(!u)return;
+  window.open(u,'_blank','noopener');
+};
+$('dlHtml').onclick=function(){
+  $('st').style.color='#a33';$('st').textContent='';
+  if(!$('g').value.trim()||!$('b').value.trim()||!$('d').value||!$('ph').value.trim()){$('st').textContent='Заполните имена, дату и номер WhatsApp.';return}
+  var f=$('mp').files[0];
+  if(f&&f.size>8*1024*1024){$('st').textContent='mp3 слишком тяжёлый. Сожмите его до 4 МБ.';return}
+  var cfg=getFormConfig();
+  readA(f,function(a){readI($('cv').files[0],function(i){readM(Array.prototype.slice.call($('pics').files,0,6),function(pc){save(buildFromConfig(cfg,a,i,pc))})})});
+};
+</script></body></html>
